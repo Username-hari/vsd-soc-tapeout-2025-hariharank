@@ -46,29 +46,166 @@ A crucial concept in this workflow is maintaining consistency across all stages.
 * Clone the Yosys repository.
 * Install required dependencies (build tools, libraries).
 * Build and install Yosys for RTL synthesis.
+<details>
+<summary>Click to view installation commands</summary>
 
-**Installation Snapshot:**
-* *(<img width="900" height="573" alt="image" src="https://github.com/user-attachments/assets/dbe929be-8b5a-4b33-86ba-03df44d3477b" />
-)*.
+```bash
+# Update package lists
+sudo apt-get update
+# Install essential build tools and Yosys dependencies
+sudo apt-get install -y build-essential clang bison flex \
+libreadline-dev gawk tcl-dev libffi-dev git \
+graphviz xdot pkg-config python3 libboost-system-dev \
+libboost-python-dev libboost-filesystem-dev zlib1g-dev
+# Clone the repository
+git clone [https://github.com/YosysHQ/yosys.git](https://github.com/YosysHQ/yosys.git)
+cd yosys
+# Configure, compile, and install
+make config-gcc
+make
+sudo make install
+</details>
 
-### 3. Install Icarus Verilog (Iverilog)
-* Install Iverilog for simulation of Verilog designs.
+Installation Snapshot:
 
-**Installation Snapshot:**
-* *(<img width="1179" height="798" alt="image" src="https://github.com/user-attachments/assets/624e691d-8ab9-46b7-8370-a11745f622a7" />
-)*.
+<img width="900" height="573" alt="image" src="https://github.com/user-attachments/assets/dbe929be-8b5a-4b33-86ba-03df44d3477b" />
 
-### 4. Install GTKWave
-* Install GTKWave to view simulation waveforms.
+3. Install Icarus Verilog (Iverilog)
+Install Iverilog for simulation of Verilog designs.
 
-**Installation Snapshot:**
-* *(<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/c8a3ffa1-5280-41bf-a53a-a17593e9bfa6" />
-)*.
+<details>
+<summary>Click to view installation commands</summary>
 
-### 5. Optional: OpenSTA
-* For timing analysis (not required for SFAL participants).
-* Install OpenSTA from the OpenROAD project repository.
+Bash
+
+# Update package lists
+sudo apt-get update
+# Install Icarus Verilog
+sudo apt-get install -y iverilog
+</details>
+
+Installation Snapshot:
+
+<img width="1179" height="798" alt="image" src="https://github.com/user-attachments/assets/624e691d-8ab9-46b7-8370-a11745f622a7" />
+
+4. Install GTKWave
+Install GTKWave to view simulation waveforms.
+
+<details>
+<summary>Click to view installation commands</summary>
+
+Bash
+
+# Update package lists
+sudo apt-get update
+# Install GTKWave
+sudo apt-get install -y gtkwave
+</details>
+
+Installation Snapshot:
+
+<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/c8a3ffa1-5280-41bf-a53a-a17593e9bfa6" />
+
+5. Install ngspice
+Install the ngspice circuit simulator.
+
+<details>
+<summary>Click to view installation commands</summary>
+
+Bash
+
+# Assumes you have downloaded the tarball (e.g., ngspice-37.tar.gz)
+tar -zxvf ngspice-*.tar.gz
+cd ngspice-*
+# Create a build directory
+mkdir release
+cd release
+# Configure, compile, and install
+../configure --with-x --with-readline=yes --disable-debug
+make
+sudo make install
+</details>
+
+Installation Snapshot:
+
+<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/c28dca87-7c5f-4483-a5c4-c92ba41f5be5" />
 
 
-### Installation Flow
-Setup VirtualBox + Ubuntu → Install Yosys → Install Iverilog → Install GTKWave → (Optional) OpenSTA
+6. Install Magic
+Install the Magic VLSI layout tool.
+
+<details>
+<summary>Click to view installation commands</summary>
+
+Bash
+
+# Update package lists
+sudo apt-get update
+# Install dependencies
+sudo apt-get install -y m4 tcsh csh libx11-dev tcl-dev tk-dev \
+libcairo2-dev mesa-common-dev libglu1-mesa-dev libncurses-dev
+# Clone the repository
+git clone [https://github.com/RTimothyEdwards/magic](https://github.com/RTimothyEdwards/magic)
+cd magic
+# Configure, compile, and install
+./configure
+make
+sudo make install
+</details>
+
+Installation Snapshot:
+
+<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/e0323ed8-6d3f-4536-a569-d3409aedf73d" />
+
+
+7. Install OpenLANE
+Install the OpenLANE automated RTL to GDSII flow.
+
+<details>
+<summary>Click to view installation commands</summary>
+
+Bash
+
+# Update package lists and upgrade
+sudo apt-get update && sudo apt-get upgrade
+# Install dependencies
+sudo apt install -y build-essential python3 python3-venv python3-pip make git
+# Install Docker (required by OpenLANE)
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+# Clone the repository
+git clone [https://github.com/The-OpenROAD-Project/OpenLane](https://github.com/The-OpenROAD-Project/OpenLane)
+cd OpenLane
+# Build the OpenLANE environment using make
+make
+# Run the built-in test to verify the flow
+make test
+</details>
+
+Installation Snapshot:
+
+<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/4dedda12-29c1-4e0f-b811-008086866dc3" />
+
+
+8. Optional: OpenSTA
+For timing analysis (not required for SFAL participants).
+
+Install OpenSTA from the OpenROAD project repository.
+
+<details>
+<summary>Click to view installation commands</summary>
+
+Bash
+
+# Clone the repository
+git clone [https://github.com/The-OpenROAD-Project/OpenSTA.git](https://github.com/The-OpenROAD-Project/OpenSTA.git)
+cd OpenSTA
+# Create a build directory
+mkdir build
+cd build
+# Configure and build
+cmake ..
+make
+</details>
+
+Installation Flow
+Setup VirtualBox + Ubuntu → Yosys → Iverilog → GTKWave → ngspice → Magic → OpenLANE → (Optional) OpenSTA
