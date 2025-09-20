@@ -1,211 +1,290 @@
-# Digital VLSI SOC Design and Planning
-
----
+# Digital VLSI SoC Design and Planning
 
 ## Task 1 – Chip Journey
 
-1.  **C Code → Compile with GCC → Verified (O1)**
-    * This is the initial high-level specification, often written as a **C model**, to define the chip's intended behavior. It's verified using a C testbench.
+**High-level flow (summary):**
 
-2.  **RTL Design (Verilog/VHDL) → Verified (O2)**
-    * The hardware is described using a Register Transfer Level (RTL) language like **Verilog**. This "soft copy" of the hardware is also verified to ensure it matches the C model's functionality.
+1. **C Code → Compile with GCC → Verified (O1)**
 
-3.  **ASIC Synthesis → Gate-level Netlist/Macros/Analog IPs → Verified (O3)**
-    * The RTL code is converted into a physical representation made of standard logic gates (**Gate-Level Netlist**), synthesized macros, and analog IPs. The output of this stage is verified to be logically equivalent to the RTL design.
+   * The initial high-level specification is often written as a C model that defines the chip's intended behavior. It is verified using a C testbench.
 
-4.  **SoC Integration**
-    * The synthesized components, including the processor, peripherals, and other IPs, are integrated together.
+2. **RTL Design (Verilog/VHDL) → Verified (O2)**
 
-5.  **Physical Design → GDSII Layout → Fabrication**
-    * This involves creating the actual physical layout of the chip through steps like **floorplanning, placement, and routing**. The final output is a GDSII file, which is sent for manufacturing.
+   * HDL (Register Transfer Level) code (Verilog or VHDL) describes the hardware. This RTL is verified to ensure it matches the C model's functionality.
 
-6.  **Post-Silicon Test → Run same C testbench → Verified (O4)**
-    * After the chip is fabricated, the original C testbench is run on the physical silicon to confirm that the hardware works as intended in the real world.
+3. **ASIC Synthesis → Gate-level Netlist / Macros / Analog IPs → Verified (O3)**
 
-7.  **Applications**
-    * The finished chip can be used in various applications, such as **smartwatches, Arduino boards, TV panels, and AC controllers**.
+   * RTL is synthesized into a gate-level netlist and instantiated macros and analog IPs. The output is verified for logical equivalence with the RTL.
 
-### Final Check
+4. **SoC Integration**
 
-A crucial concept in this workflow is maintaining consistency across all stages. The behavior and output should match at every verification point:
-**O1 == O2 == O3 == O4**
+   * Integrate synthesized components (processor, peripherals, IP blocks, buses, etc.) into the SoC.
+
+5. **Physical Design → GDSII Layout → Fabrication**
+
+   * Perform floorplanning, placement, routing, extraction and LVS/DRC. Generate final GDSII for fabrication.
+
+6. **Post-Silicon Test → Run same C testbench → Verified (O4)**
+
+   * After fabrication, run the original C testbench on silicon to confirm real-world functionality.
+
+**Applications**
+
+* The finished chip can be used in devices like smartwatches, Arduino boards, TV panels, AC controllers, and other embedded products.
+
+**Final check / golden rule:**
+
+* Maintain consistency across all verification points so the observed behavior matches at every stage:
+
+```
+O1 == O2 == O3 == O4
+```
 
 ---
 
-## Task 2 - Tool Installation and Setup
+## Task 2 — Tool Installation and Setup
 
 ### 1. Setup Virtual Environment
-* Install **Oracle VirtualBox**.
-* Check system requirements:
-    * 6 GB RAM
-    * 50 GB HDD
-    * Ubuntu 20.04+
-    * 4 vCPUs
 
-### 2. Install Yosys
-* Clone the Yosys repository.
-* Install required dependencies (build tools, libraries).
-* Build and install Yosys for RTL synthesis.
+* Install Oracle VirtualBox (or another virtualization solution).
+* **Recommended VM specs:**
+
+  * 6 GB RAM (minimum)
+  * 50 GB HDD available
+  * Ubuntu 20.04 LTS or newer
+  * 4 vCPUs
+
+---
+
+### 2. Install Yosys (RTL synthesis)
+
+* Clone the Yosys repository, install build dependencies, build and install.
+
 <details>
 <summary>Click to view installation commands</summary>
 
 ```bash
 # Update package lists
 sudo apt-get update
+
 # Install essential build tools and Yosys dependencies
 sudo apt-get install -y build-essential clang bison flex \
-libreadline-dev gawk tcl-dev libffi-dev git \
-graphviz xdot pkg-config python3 libboost-system-dev \
-libboost-python-dev libboost-filesystem-dev zlib1g-dev
+  libreadline-dev gawk tcl-dev libffi-dev git \
+  graphviz xdot pkg-config python3 libboost-system-dev \
+  libboost-python-dev libboost-filesystem-dev zlib1g-dev
+
 # Clone the repository
-git clone [https://github.com/YosysHQ/yosys.git](https://github.com/YosysHQ/yosys.git)
+git clone https://github.com/YosysHQ/yosys.git
 cd yosys
+
 # Configure, compile, and install
 make config-gcc
-make
+make -j$(nproc)
 sudo make install
+```
+
 </details>
 
-Installation Snapshot:
+**Installation snapshot:**
 
-<img width="900" height="573" alt="image" src="https://github.com/user-attachments/assets/dbe929be-8b5a-4b33-86ba-03df44d3477b" />
+<img width="900" height="573" alt="image" src="https://github.com/user-attachments/assets/06330b80-f167-40f8-b04c-43de070881ca" />
 
-3. Install Icarus Verilog (Iverilog)
-Install Iverilog for simulation of Verilog designs.
+
+---
+
+### 3. Install Icarus Verilog (iverilog)
+
+* Icarus Verilog is used for Verilog simulation.
 
 <details>
 <summary>Click to view installation commands</summary>
 
-Bash
-
+```bash
 # Update package lists
 sudo apt-get update
+
 # Install Icarus Verilog
 sudo apt-get install -y iverilog
+```
+
 </details>
 
-Installation Snapshot:
+**Installation snapshot:**
 
-<img width="1179" height="798" alt="image" src="https://github.com/user-attachments/assets/624e691d-8ab9-46b7-8370-a11745f622a7" />
+<img width="1179" height="798" alt="image" src="https://github.com/user-attachments/assets/9fe8f64b-fe7a-4d1f-a6ef-4bc977777b81" />
 
-4. Install GTKWave
-Install GTKWave to view simulation waveforms.
+
+---
+
+### 4. Install GTKWave
+
+* GTKWave is used to view simulation waveforms.
 
 <details>
 <summary>Click to view installation commands</summary>
 
-Bash
-
+```bash
 # Update package lists
 sudo apt-get update
+
 # Install GTKWave
 sudo apt-get install -y gtkwave
+```
+
 </details>
 
-Installation Snapshot:
+**Installation snapshot:**
 
-<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/c8a3ffa1-5280-41bf-a53a-a17593e9bfa6" />
+<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/b9618561-4e39-44d2-b13b-7c2caa8fde4e" />
 
-5. Install ngspice
-Install the ngspice circuit simulator.
+
+---
+
+### 5. Install ngspice
+
+* ngspice is a circuit simulator used for analog simulations.
 
 <details>
 <summary>Click to view installation commands</summary>
 
-Bash
-
-# Assumes you have downloaded the tarball (e.g., ngspice-37.tar.gz)
+```bash
+# If using a packaged tarball (example: ngspice-37.tar.gz):
+# Extract the tarball
 tar -zxvf ngspice-*.tar.gz
 cd ngspice-*
+
 # Create a build directory
 mkdir release
 cd release
+
 # Configure, compile, and install
 ../configure --with-x --with-readline=yes --disable-debug
-make
+make -j$(nproc)
 sudo make install
+```
+
 </details>
 
-Installation Snapshot:
+**Installation snapshot:**
 
-<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/c28dca87-7c5f-4483-a5c4-c92ba41f5be5" />
+<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/9d5d35b4-0f98-4f22-90e1-541b9819a0c0" />
 
 
-6. Install Magic
-Install the Magic VLSI layout tool.
+---
+
+### 6. Install Magic (VLSI layout)
+
+* Magic is an open-source VLSI layout tool.
 
 <details>
 <summary>Click to view installation commands</summary>
 
-Bash
-
+```bash
 # Update package lists
 sudo apt-get update
+
 # Install dependencies
 sudo apt-get install -y m4 tcsh csh libx11-dev tcl-dev tk-dev \
-libcairo2-dev mesa-common-dev libglu1-mesa-dev libncurses-dev
+  libcairo2-dev mesa-common-dev libglu1-mesa-dev libncurses-dev
+
 # Clone the repository
-git clone [https://github.com/RTimothyEdwards/magic](https://github.com/RTimothyEdwards/magic)
+git clone https://github.com/RTimothyEdwards/magic.git
 cd magic
+
 # Configure, compile, and install
 ./configure
-make
+make -j$(nproc)
 sudo make install
+```
+
 </details>
 
-Installation Snapshot:
+**Installation snapshot:**
 
-<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/e0323ed8-6d3f-4536-a569-d3409aedf73d" />
+<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/429d4752-645c-4799-ac1d-f9aac7f89522" />
 
 
-7. Install OpenLANE
-Install the OpenLANE automated RTL to GDSII flow.
+
+---
+
+### 7. Install OpenLANE (OpenLane) — RTL-to-GDS flow
+
+* OpenLane provides an automated open-source flow from RTL to GDSII. It requires Docker.
 
 <details>
 <summary>Click to view installation commands</summary>
 
-Bash
-
+```bash
 # Update package lists and upgrade
-sudo apt-get update && sudo apt-get upgrade
-# Install dependencies
+sudo apt-get update && sudo apt-get upgrade -y
+
+# Install base dependencies
 sudo apt install -y build-essential python3 python3-venv python3-pip make git
-# Install Docker (required by OpenLANE)
-sudo apt install -y docker-ce docker-ce-cli containerd.io
-# Clone the repository
-git clone [https://github.com/The-OpenROAD-Project/OpenLane](https://github.com/The-OpenROAD-Project/OpenLane)
+
+# Install Docker (follow Docker official instructions for your distro)
+# Example (Ubuntu):
+sudo apt-get install -y docker.io
+sudo systemctl enable --now docker
+
+# Clone the OpenLane repository
+git clone https://github.com/The-OpenROAD-Project/OpenLane.git
 cd OpenLane
-# Build the OpenLANE environment using make
+
+# Build the OpenLane environment (this may take a while)
 make
-# Run the built-in test to verify the flow
+
+# (Optional) Run the built-in tests to verify the flow
 make test
+```
+
 </details>
 
-Installation Snapshot:
+---
 
-<img width="898" height="576" alt="image" src="https://github.com/user-attachments/assets/4dedda12-29c1-4e0f-b811-008086866dc3" />
+### 8. Optional: OpenSTA (Static Timing Analysis)
 
-
-8. Optional: OpenSTA
-For timing analysis (not required for SFAL participants).
-
-Install OpenSTA from the OpenROAD project repository.
+* OpenSTA is used for timing analysis and is part of the OpenROAD project tools.
 
 <details>
 <summary>Click to view installation commands</summary>
 
-Bash
-
+```bash
 # Clone the repository
-git clone [https://github.com/The-OpenROAD-Project/OpenSTA.git](https://github.com/The-OpenROAD-Project/OpenSTA.git)
+git clone https://github.com/The-OpenROAD-Project/OpenSTA.git
 cd OpenSTA
+
 # Create a build directory
 mkdir build
 cd build
+
 # Configure and build
 cmake ..
-make
+make -j$(nproc)
+```
+
 </details>
 
-Installation Flow
-Setup VirtualBox + Ubuntu → Yosys → Iverilog → GTKWave → ngspice → Magic → OpenLANE → (Optional) OpenSTA
+---
+
+## Installation flow (recommended order)
+
+1. Setup VirtualBox and Ubuntu VM
+2. Yosys (synthesis)
+3. Icarus Verilog (simulation)
+4. GTKWave (waveform viewer)
+5. ngspice (analog simulation)
+6. Magic (layout)
+7. OpenLane (RTL → GDSII flow)
+8. (Optional) OpenSTA (timing analysis)
+
+---
+
+## Verification checklist (after each stage)
+
+* **O1:** C model passes testbench.
+* **O2:** RTL simulation matches the C model.
+* **O3:** Gate-level netlist (post-synthesis) matches RTL behavior (logical equivalence).
+* **O4:** Post-silicon tests run the same C testbench and pass on silicon.
+
+---
+
